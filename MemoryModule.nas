@@ -46,14 +46,14 @@ MemoryModule = {
         # If there was an echo in the current scan frame.
         if(graph.nodesContent[me.echoNodeName][id])
             # Update the last echo time of the contact.
-            graph.rawData[id].echoTime = me.frameTime;
+            radar.rawData[id].echoTime = me.frameTime;
         
         # If the last echo of the contact happened more than me.timeToKeepEchos ago:
         if(graph.rawData[id].echoTime != nil and me.frameTime - graph.rawData[id].echoTime > me.timeToKeepEchos)
             # Remove the echo memory from the contact;
-            graph.rawData[id].echoTime = nil;
+            radar.rawData[id].echoTime = nil;
         
         # Only keep contacts with echo memory.
-        return graph.rawData[id].echoTime != nil;
+        return radar.rawData[id].echoTime != nil;
     },
 };

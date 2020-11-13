@@ -44,12 +44,12 @@ MemoryModule = {
     #! \param     dt: The delta time of the radar to simulate (seconds).
     compute: func(radar, id){
         # If there was an echo in the current scan frame.
-        if(graph.nodesContent[me.echoNodeName][id])
+        if(radar.nodesContent[me.echoNodeName][id])
             # Update the last echo time of the contact.
             radar.rawData[id].echoTime = me.frameTime;
         
         # If the last echo of the contact happened more than me.timeToKeepEchos ago:
-        if(graph.rawData[id].echoTime != nil and me.frameTime - graph.rawData[id].echoTime > me.timeToKeepEchos)
+        if(radar.rawData[id].echoTime != nil and me.frameTime - radar.rawData[id].echoTime > me.timeToKeepEchos)
             # Remove the echo memory from the contact;
             radar.rawData[id].echoTime = nil;
         

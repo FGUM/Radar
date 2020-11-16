@@ -255,10 +255,11 @@ Kernel = {
     new: func(modules) {
         var me = {parents: [Kernel]};
         
-        me.rawData        = {};  #!< The MOLG root data (dictionary).
-        me.nodeList       = [];  #!< The list of available nodes in the graph (array).
-        me.nodesContent   = {};  #!< The data of each nodes (dictionary of dictionaries).
-        me.moduleLayers   = [];  #!< The layers of modules (array of arrays).
+        me.rawDataMtx     = thread.newlock();  #!< Mutual exclusion protecting the rawData member;
+        me.rawData        = {};                #!< The MOLG root data (dictionary).
+        me.nodeList       = [];                #!< The list of available nodes in the graph (array).
+        me.nodesContent   = {};                #!< The data of each nodes (dictionary of dictionaries).
+        me.moduleLayers   = [];                #!< The layers of modules (array of arrays).
         
         var unknownLayer = modules;
         
@@ -294,26 +295,39 @@ Kernel = {
         return me;
     },
     
+    setRawData: func(rawData){
+        # Make sure a computational frame won't run during the raw data update.
+        thread.lock(me.rawDataMtx);
+        
+        me.rawData = rawData;
+        
+        # Release the mutex so a computational can happen.
+        thread.unlock(me.rawDataMtx);
+    },
+    
     #! \brief Run a computational frame.
     #! \param rawData: The dictionary of raw data to propagate through the logic graph.
-    frame: func(rawData){
+    frame: func(){
         # Compute the time elapsed since the last frame (dt).
         var curFrame = getprop("sim/time/elapsed-sec");
         var dt = curFrame - me.lastFrame;
         me.lastFrame = curFrame;
         
-        # Update the graph root values.
-        me.rawData = rawData;
+        # Update each module.
+        me.update(dt);
+        
+        # Make sure the raw data is not updated during a computational frame.
+        thread.lock(me.rawDataMtx);
         
         # Declare the nodes of the graph.
         me.prepareNodes();
         
-        # Update each module.
-        me.update(dt);
-        
         # Compute each rawData element with each module.
         foreach(var i; keys(me.rawData))
-            bind(func(){me.compute(i)}, {me:me, i:i})();
+            bind(func(){g.compute(i)}, {g: me, i:i})();
+        
+        # Release the mutex so the raw data can be updated again.
+        thread.unlock(me.rawDataMtx);
     },
     
     #! \brief Initialize each graph node.

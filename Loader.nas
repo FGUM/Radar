@@ -6,6 +6,7 @@
 # Loader for the Radar module.
 #
 
+io.load_nasal(resolvepath("FGUM/Radar/Pipeline.nas"),              "FGUM_Radar");
 io.load_nasal(resolvepath("FGUM/Radar/MOLG.nas"),                  "FGUM_Radar_MOLG");
 io.load_nasal(resolvepath("FGUM/Radar/RadarContact.nas"),          "FGUM_Radar");
 io.load_nasal(resolvepath("FGUM/Radar/Radar.nas"),                 "FGUM_Radar");

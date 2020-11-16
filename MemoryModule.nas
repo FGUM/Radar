@@ -15,13 +15,13 @@ MemoryModule = {
     #! \param   echoNodeName: The MOLG node name containing raw echo data (string).
     #! \param   memoryNodeName: The MOLG node name to be updated with the memory data (string).
     #! \param   timeToKeepEchos: The time an echo will be kept in memory (seconds).
-    new: func (echoNodeName, memoryNodeName, timeToKeepEchos){
+    new: func (memoryNodeName, echoNodeName, timeToKeepEchos){
         var me = {parents: [MemoryModule, 
                             FGUM_Radar_MOLG.Module.new(std.Vector.new([echoNodeName]),      # Module dependencies: The graph node that defines whether an echo was received from the target or not. 
                                                        std.Vector.new([memoryNodeName]))]};  # Module outputs: The node guaranteed to be satisfied by the memory module (compute function).
         
-        me.echoNodeName   = echoNodeName;
         me.memoryNodeName  = memoryNodeName;
+        me.echoNodeName    = echoNodeName;
         me.timeToKeepEchos = timeToKeepEchos;
         me.frameTime = 0;
         
